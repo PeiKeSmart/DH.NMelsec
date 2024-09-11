@@ -170,7 +170,7 @@ namespace NewLife.Net
         #region 发送
         /// <summary>写入数据</summary>
         /// <param name="pk">数据包</param>
-        public virtual Int32 Send(Packet pk)
+        public virtual Int32 Send(IPacket pk)
         {
             if (!Open()) return -1;
 
@@ -179,7 +179,7 @@ namespace NewLife.Net
             var sp = Serial;
             lock (sp)
             {
-                sp.Write(pk.Data, pk.Offset, pk.Count);
+                sp.Write(((Packet)pk).Data, ((Packet)pk).Offset, ((Packet)pk).Count);
             }
 
             return pk.Total;
@@ -211,14 +211,14 @@ namespace NewLife.Net
 
         /// <summary>接收数据</summary>
         /// <returns></returns>
-        public virtual Packet Receive()
+        public virtual IOwnerPacket Receive()
         {
             if (!Open()) return null;
 
             var task = SendAsync(null);
             if (Timeout > 0 && !task.Wait(Timeout)) return null;
 
-            return task.Result;
+            return (IOwnerPacket)task.Result;
         }
         #endregion
 
